@@ -1,3 +1,4 @@
+import { Observable } from "rxjs/Observable";
 import { ReponseToDo } from "./../../providers/json-placeholder/json-placeholder";
 import { Component, OnInit } from "@angular/core";
 import {
@@ -8,8 +9,7 @@ import {
 } from "ionic-angular";
 import {
   JsonPlaceholderProvider,
-  ToDo,
-  ReponseToDo
+  ToDo
 } from "../../providers/json-placeholder/json-placeholder";
 
 /**
@@ -25,7 +25,8 @@ import {
   templateUrl: "to-do-list.html"
 })
 export class ToDoListPage implements OnInit {
-  private toDoList: Array<ToDo>;
+  random$: Observable<number>;
+  private toDoList: Array<ToDo> = [];
 
   constructor(
     public navCtrl: NavController,
@@ -36,36 +37,20 @@ export class ToDoListPage implements OnInit {
   ngOnInit(): void {
     console.log("OnInit");
     this.getTodos();
-  }
-  sortTodos(data) {
-    data.sort(function(a, b) {
-      return b.id - a.id;
-    });
-    return data;
+
+    this.random$ = this.todosService.random$;
   }
 
   getTodos() {
-    this.todosService.getTodos().subscribe(data => {
+    this.todosService.todolist.subscribe(data => {
       this.toDoList = data;
-      this.sortTodos(this.toDoList);
     });
-  }
-
-  getNewTodo() {
-    if (this.todosService.response !== undefined) {
-      this.toDoList.push({
-        userId: null,
-        id: this.generateIdTodo(),
-        title: this.todosService.response.title,
-        completed: false
-      });
-      this.sortTodos(this.toDoList);
-    }
   }
 
   generateIdTodo() {
     return this.toDoList.length + 1;
   }
+
   delete(toDo: ToDo) {
     if (toDo.id > 200) {
       this.toDoList.splice(this.toDoList.indexOf(toDo), 1);
@@ -152,7 +137,7 @@ export class ToDoListPage implements OnInit {
   }
 
   ionViewDidEnter() {
-    this.getNewTodo();
+    //this.getNewTodo();
     console.log("Enter");
   }
 }

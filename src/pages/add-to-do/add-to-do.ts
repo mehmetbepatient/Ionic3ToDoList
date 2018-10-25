@@ -34,6 +34,10 @@ export class AddToDoPage {
   ) {}
 
   addToDo() {
+    this.todosService.addTodo(this.todoToAdd); // Promise a faire ?
+    this.presentToast();
+
+    /*
     this.todosService.addTodo(this.todoToAdd).subscribe(
       (result: ReponseToDo) => {
         console.log(result);
@@ -43,7 +47,7 @@ export class AddToDoPage {
       err => {
         console.log(err);
       }
-    );
+    );*/
   }
 
   presentToast() {
