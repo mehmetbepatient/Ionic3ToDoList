@@ -2,6 +2,7 @@ import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { Observable } from "rxjs/Observable";
 import { Subject } from "rxjs/Subject";
+import { map } from "rxjs/operators";
 
 /*
   Generated class for the JsonPlaceholderProvider provider.
@@ -14,74 +15,85 @@ export interface ToDo {
   title: string;
   completed: boolean;
 }
+
+export interface PartialToDo {
+  title?: string;
+  completed?: boolean;
+}
+
 @Injectable()
 export class JsonPlaceholderProvider {
   private API_URL: string = "https://jsonplaceholder.typicode.com";
 
-  private toDoSource = new Subject<ToDo[]>();
-  toDoList$: Observable<ToDo[]> = this.toDoSource.asObservable();
   private toDoList: Array<ToDo> = [];
+  private toDoListSource = new Subject<ToDo[]>();
+  toDoList$: Observable<ToDo[]> = this.toDoListSource
+    .asObservable()
+    .pipe(map(toDo => toDo.sort((a, b) => b.id - a.id)));
+
+  toDoListCompleted$: Observable<ToDo[]> = this.toDoList$.pipe(
+    map(toDo => toDo.filter(toDo => toDo.completed))
+  );
+  toDoListNotCompleted$: Observable<ToDo[]> = this.toDoList$.pipe(
+    map(toDo => toDo.filter(toDo => !toDo.completed))
+  );
 
   constructor(public http: HttpClient) {
-    console.log("Hello JsonPlaceholderProvider Provider");
-
     this.getTodos();
   }
 
   getTodos(): void {
     this.http.get<ToDo[]>(`${this.API_URL}/todos`).subscribe(data => {
-      this.toDoList = data.sort((a, b) => b.id - a.id);
-      this.toDoSource.next(this.toDoList);
+      this.toDoList = data;
+      this.toDoListSource.next(this.toDoList);
     });
   }
 
   addTodo(data: ToDo): void {
     this.http.post<ToDo>(`${this.API_URL}/todos`, data).subscribe(data => {
-      console.log(data);
-      this.toDoList.unshift({
-        id: this.toDoList.length + 1,
+      this.toDoList.push({
+        id: this.maxToDoUID(this.toDoList),
         title: data.title,
         completed: false
       });
-      this.toDoSource.next(this.toDoList);
+      this.toDoListSource.next(this.toDoList);
     });
   }
-  patchTodo(data: Array<ToDo>): void {
-    this.http
-      .patch<ToDo>(`${this.API_URL}/todos/${data[0].id}`, data[0])
-      .subscribe(
-        result => {
-          console.log(this.toDoList.indexOf(result));
-          console.log(result);
 
-          this.toDoList.splice(this.toDoList.indexOf(data[1]), 1, {
-            id: this.toDoList.length + 1,
-            title: result.title,
-            completed: result.completed
-          });
-          this.toDoSource.next(this.toDoList);
-        },
-        err => {
-          this.toDoList.splice(this.toDoList.indexOf(data[1]), 1, {
-            id: this.toDoList.length + 1,
-            title: data[0].title,
-            completed: data[0].completed
-          });
-          this.toDoSource.next(this.toDoList);
-        }
-      );
+  patchTodo(todo: ToDo, values: PartialToDo): void {
+    this.http.patch<ToDo>(`${this.API_URL}/todos/${todo.id}`, values).subscribe(
+      result => {
+        this.toDoList.splice(this.toDoList.indexOf(todo), 1, {
+          id: this.maxToDoUID(this.toDoList),
+          title: result.title,
+          completed: result.completed
+        });
+        this.toDoListSource.next(this.toDoList);
+      },
+      () => {
+        this.toDoList.splice(this.toDoList.indexOf(todo), 1, {
+          id: this.maxToDoUID(this.toDoList),
+          title: values.title,
+          completed: values.completed
+        });
+        this.toDoListSource.next(this.toDoList);
+      }
+    );
   }
   deleteTodo(data): void {
     this.http.delete<ToDo>(`${this.API_URL}/todos/${data.id}`).subscribe(
-      result => {
-        console.log(this.toDoList.indexOf(data));
+      () => {
         this.toDoList.splice(this.toDoList.indexOf(data), 1);
-        this.toDoSource.next(this.toDoList);
+        this.toDoListSource.next(this.toDoList);
       },
-      err => {
+      () => {
         this.toDoList.splice(this.toDoList.indexOf(data), 1);
-        this.toDoSource.next(this.toDoList);
+        this.toDoListSource.next(this.toDoList);
       }
     );
+  }
+
+  private maxToDoUID(toDoList: Array<ToDo>): number {
+    return Math.max(...toDoList.map(toDo => toDo.id)) + 1;
   }
 }

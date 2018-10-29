@@ -19,8 +19,8 @@
   </ion-navbar>
 
   <ion-list>
-    <ion-item-sliding *ngFor="let toDo of (toDoList$ | async )">
-      <ion-item *ngIf="!toDo.completed">
+    <ion-item-sliding *ngFor="let toDo of (toDoListNotCompleted$ | async )">
+      <ion-item>
         <ion-label>{{ toDo.title }}</ion-label>
         <ion-toggle (ionChange)="updateStatus(toDo)" [checked]="toDo.completed"></ion-toggle>
       </ion-item>
@@ -44,8 +44,8 @@
   </ion-navbar>
 
   <ion-list>
-    <ion-item-sliding *ngFor="let toDo of (toDoList$ | async )">
-      <ion-item *ngIf="toDo.completed">
+    <ion-item-sliding *ngFor="let toDo of (toDoListCompleted$ | async )">
+      <ion-item>
         <ion-label>{{ toDo.title }}</ion-label>
         <ion-toggle (ionChange)="updateStatus(toDo)" [checked]="toDo.completed"></ion-toggle>
       </ion-item>

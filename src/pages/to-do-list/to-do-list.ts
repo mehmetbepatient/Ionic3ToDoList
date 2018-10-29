@@ -24,7 +24,8 @@ import {
   templateUrl: "to-do-list.html"
 })
 export class ToDoListPage implements OnInit {
-  toDoList$: Observable<ToDo[]>;
+  toDoListCompleted$: Observable<ToDo[]>;
+  toDoListNotCompleted$: Observable<ToDo[]>;
 
   constructor(
     public navCtrl: NavController,
@@ -33,8 +34,8 @@ export class ToDoListPage implements OnInit {
     private alertCtrl: AlertController
   ) {}
   ngOnInit(): void {
-    console.log("OnInit");
-    this.toDoList$ = this.todosService.toDoList$;
+    this.toDoListCompleted$ = this.todosService.toDoListCompleted$;
+    this.toDoListNotCompleted$ = this.todosService.toDoListNotCompleted$;
   }
 
   delete(toDo: ToDo) {
@@ -43,10 +44,10 @@ export class ToDoListPage implements OnInit {
 
   updateStatus(toDo: ToDo) {
     setTimeout(() => {
-      this.todosService.patchTodo([
-        { id: toDo.id, title: toDo.title, completed: !toDo.completed },
-        toDo
-      ]);
+      this.todosService.patchTodo(toDo, {
+        title: toDo.title,
+        completed: !toDo.completed
+      });
     }, 500);
   }
   showPrompt(toDo: ToDo) {
@@ -69,16 +70,11 @@ export class ToDoListPage implements OnInit {
         {
           text: "Save",
           handler: data => {
-            console.log(toDo);
-
-            this.todosService.patchTodo([
-              {
-                id: toDo.id,
-                title: data.title,
-                completed: false
-              },
-              toDo
-            ]);
+            console.log("Save clicked");
+            this.todosService.patchTodo(toDo, {
+              title: data.title,
+              completed: false
+            });
           }
         }
       ]

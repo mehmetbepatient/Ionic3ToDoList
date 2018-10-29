@@ -30,7 +30,7 @@ export class AddToDoPage {
   ) {}
 
   addToDo() {
-    this.todosService.addTodo(this.todoToAdd); // Promise a faire ?
+    this.todosService.addTodo(this.todoToAdd);
     this.presentToast();
   }
 
@@ -42,9 +42,5 @@ export class AddToDoPage {
     });
 
     toast.present();
-  }
-
-  ionViewDidLoad() {
-    console.log("ionViewDidLoad AddToDoPage");
   }
 }
