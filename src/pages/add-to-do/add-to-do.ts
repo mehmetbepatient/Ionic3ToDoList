@@ -5,11 +5,7 @@ import {
   NavParams,
   ToastController
 } from "ionic-angular";
-import {
-  JsonPlaceholderProvider,
-  ReponseToDo,
-  ToDo
-} from "../../providers/json-placeholder/json-placeholder";
+import { JsonPlaceholderProvider } from "../../providers/json-placeholder/json-placeholder";
 
 /**
  * Generated class for the AddToDoPage page.
@@ -36,18 +32,6 @@ export class AddToDoPage {
   addToDo() {
     this.todosService.addTodo(this.todoToAdd); // Promise a faire ?
     this.presentToast();
-
-    /*
-    this.todosService.addTodo(this.todoToAdd).subscribe(
-      (result: ReponseToDo) => {
-        console.log(result);
-        this.todosService.response = <ToDo>result;
-        this.presentToast();
-      },
-      err => {
-        console.log(err);
-      }
-    );*/
   }
 
   presentToast() {

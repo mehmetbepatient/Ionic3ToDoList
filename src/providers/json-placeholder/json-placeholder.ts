@@ -1,9 +1,7 @@
-import { ReponseToDo } from "./json-placeholder";
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { Observable } from "rxjs/Observable";
 import { Subject } from "rxjs/Subject";
-import { BehaviorSubject } from "rxjs/BehaviorSubject";
 
 /*
   Generated class for the JsonPlaceholderProvider provider.
@@ -12,12 +10,6 @@ import { BehaviorSubject } from "rxjs/BehaviorSubject";
   and Angular DI.
 */
 export interface ToDo {
-  userId: number;
-  id: number;
-  title: string;
-  completed: boolean;
-}
-export interface ReponseToDo {
   id: number;
   title: string;
   completed: boolean;
@@ -25,74 +17,71 @@ export interface ReponseToDo {
 @Injectable()
 export class JsonPlaceholderProvider {
   private API_URL: string = "https://jsonplaceholder.typicode.com";
-  private responseProvider: ToDo;
 
-  private randomSource = new BehaviorSubject<number>(0);
-  random$: Observable<number> = this.randomSource.asObservable();
-
-  private toDoList = new BehaviorSubject<any>(0);
+  private toDoSource = new Subject<ToDo[]>();
+  toDoList$: Observable<ToDo[]> = this.toDoSource.asObservable();
+  private toDoList: Array<ToDo> = [];
 
   constructor(public http: HttpClient) {
     console.log("Hello JsonPlaceholderProvider Provider");
 
-    this.toDoList.subscribe(
-      n => console.log(n),
-      e => console.log(e),
-      () => console.log("completed")
-    );
-
     this.getTodos();
-
-    setInterval(() => {
-      this.randomSource.next(Math.round(1000 * Math.random()));
-    }, 1000);
   }
 
   getTodos(): void {
     this.http.get<ToDo[]>(`${this.API_URL}/todos`).subscribe(data => {
-      data.sort(function(a, b) {
-        return b.id - a.id;
-      });
-
-      this.toDoList.next(data);
+      this.toDoList = data.sort((a, b) => b.id - a.id);
+      this.toDoSource.next(this.toDoList);
     });
   }
 
-  addTodo(data: ReponseToDo): void {
-    this.http
-      .post<ReponseToDo>(`${this.API_URL}/todos`, data)
-      .subscribe(data => {
-        console.log(data);
-        this.toDoList.getValue().push({
-          userId: null,
-          id: this.toDoList.getValue().length + 1,
-          title: data.title,
-          completed: false
-        });
-        this.toDoList.next(
-          this.toDoList.getValue().sort(function(a, b) {
-            return b.id - a.id;
-          })
-        );
+  addTodo(data: ToDo): void {
+    this.http.post<ToDo>(`${this.API_URL}/todos`, data).subscribe(data => {
+      console.log(data);
+      this.toDoList.unshift({
+        id: this.toDoList.length + 1,
+        title: data.title,
+        completed: false
       });
+      this.toDoSource.next(this.toDoList);
+    });
   }
-  patchTodo(data): Observable<ReponseToDo> {
-    return this.http.patch<ReponseToDo>(
-      `${this.API_URL}/todos/${data.id}`,
-      data
-    );
-  }
-  deleteTodo(data): Observable<ReponseToDo> {
-    return this.http.delete<ReponseToDo>(`${this.API_URL}/todos/${data.id}`);
-  }
-  get response(): ToDo {
-    return this.responseProvider;
-  }
-  set response(response: ToDo) {
-    this.responseProvider = response;
-  }
+  patchTodo(data: Array<ToDo>): void {
+    this.http
+      .patch<ToDo>(`${this.API_URL}/todos/${data[0].id}`, data[0])
+      .subscribe(
+        result => {
+          console.log(this.toDoList.indexOf(result));
+          console.log(result);
 
-  get todolist(): Subject<ToDo[]> {
-    return this.toDoList;
+          this.toDoList.splice(this.toDoList.indexOf(data[1]), 1, {
+            id: this.toDoList.length + 1,
+            title: result.title,
+            completed: result.completed
+          });
+          this.toDoSource.next(this.toDoList);
+        },
+        err => {
+          this.toDoList.splice(this.toDoList.indexOf(data[1]), 1, {
+            id: this.toDoList.length + 1,
+            title: data[0].title,
+            completed: data[0].completed
+          });
+          this.toDoSource.next(this.toDoList);
+        }
+      );
+  }
+  deleteTodo(data): void {
+    this.http.delete<ToDo>(`${this.API_URL}/todos/${data.id}`).subscribe(
+      result => {
+        console.log(this.toDoList.indexOf(data));
+        this.toDoList.splice(this.toDoList.indexOf(data), 1);
+        this.toDoSource.next(this.toDoList);
+      },
+      err => {
+        this.toDoList.splice(this.toDoList.indexOf(data), 1);
+        this.toDoSource.next(this.toDoList);
+      }
+    );
   }
 }
