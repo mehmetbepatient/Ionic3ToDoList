@@ -30,12 +30,14 @@ export class AddToDoPage {
   ) {}
 
   addToDo() {
-    this.todosService.addTodo(this.todoToAdd).then(() => this.presentToast());
+    this.todosService
+      .addTodo(this.todoToAdd)
+      .then(data => this.presentToast(data));
   }
 
-  presentToast() {
+  presentToast(data) {
     let toast = this.toast.create({
-      message: "ToDo was added successfully",
+      message: `ToDo "${data.title}" was added successfully`,
       duration: 3000,
       position: "bottom"
     });

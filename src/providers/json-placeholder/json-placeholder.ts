@@ -50,7 +50,7 @@ export class JsonPlaceholderProvider {
     });
   }
 
-  addTodo(data: ToDo): Promise<void> {
+  addTodo(data: ToDo): Promise<ToDo> {
     return new Promise(resolve => {
       this.http.post<ToDo>(`${this.API_URL}/todos`, data).subscribe(data => {
         this.toDoList.push({
@@ -60,7 +60,7 @@ export class JsonPlaceholderProvider {
         });
         this.toDoListSource.next(this.toDoList);
       });
-      resolve();
+      resolve(data);
     });
   }
 
