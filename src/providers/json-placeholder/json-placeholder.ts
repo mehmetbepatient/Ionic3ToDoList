@@ -21,6 +21,12 @@ export interface PartialToDo {
   title?: string;
   completed?: boolean;
 }
+export interface PatchRes {
+  id: number;
+  title: string;
+  completed: boolean;
+  values: PartialToDo;
+}
 
 @Injectable()
 export class JsonPlaceholderProvider {
@@ -68,18 +74,18 @@ export class JsonPlaceholderProvider {
     this.http
       .patch<ToDo>(`${this.API_URL}/todos/${todo.id}`, { ...todo, values })
       .subscribe(
-        result => {
+        (result: PatchRes) => {
           this.toDoList.splice(this.toDoList.indexOf(todo), 1, {
             id: this.maxToDoUID(this.toDoList),
-            title: result.title,
-            completed: result.completed
+            title: result.values.title || result.title,
+            completed: result.values.completed
           });
           this.toDoListSource.next(this.toDoList);
         },
         () => {
           this.toDoList.splice(this.toDoList.indexOf(todo), 1, {
             id: this.maxToDoUID(this.toDoList),
-            title: values.title,
+            title: values.title || todo.title,
             completed: values.completed
           });
           this.toDoListSource.next(this.toDoList);
