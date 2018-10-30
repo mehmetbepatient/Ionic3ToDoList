@@ -49,7 +49,7 @@ export class ToDoListPage implements OnInit {
       });
     }, 500);
   }
-  showPrompt(toDo: ToDo) {
+  edit(toDo: ToDo) {
     const prompt = this.alertCtrl.create({
       title: "Edit Selected ToDo",
       message: "Enter a new Task",
@@ -79,8 +79,5 @@ export class ToDoListPage implements OnInit {
       ]
     });
     prompt.present();
-  }
-  edit(toDo: ToDo) {
-    this.showPrompt(toDo);
   }
 }

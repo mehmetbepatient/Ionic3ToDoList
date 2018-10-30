@@ -30,8 +30,7 @@ export class AddToDoPage {
   ) {}
 
   addToDo() {
-    this.todosService.addTodo(this.todoToAdd);
-    this.presentToast();
+    this.todosService.addTodo(this.todoToAdd).then(() => this.presentToast());
   }
 
   presentToast() {

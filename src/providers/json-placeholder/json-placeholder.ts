@@ -50,38 +50,41 @@ export class JsonPlaceholderProvider {
     });
   }
 
-  addTodo(data: ToDo): void {
-    this.http.post<ToDo>(`${this.API_URL}/todos`, data).subscribe(data => {
-      this.toDoList.push({
-        id: this.maxToDoUID(this.toDoList),
-        title: data.title,
-        completed: false
+  addTodo(data: ToDo): Promise<void> {
+    return new Promise(resolve => {
+      this.http.post<ToDo>(`${this.API_URL}/todos`, data).subscribe(data => {
+        this.toDoList.push({
+          id: this.maxToDoUID(this.toDoList),
+          title: data.title,
+          completed: false
+        });
+        this.toDoListSource.next(this.toDoList);
       });
-      this.toDoListSource.next(this.toDoList);
+      resolve();
     });
   }
 
   patchTodo(todo: ToDo, values: PartialToDo): void {
-    if (!values.title) values.title = todo.title;
-
-    this.http.patch<ToDo>(`${this.API_URL}/todos/${todo.id}`, values).subscribe(
-      result => {
-        this.toDoList.splice(this.toDoList.indexOf(todo), 1, {
-          id: this.maxToDoUID(this.toDoList),
-          title: result.title,
-          completed: result.completed
-        });
-        this.toDoListSource.next(this.toDoList);
-      },
-      () => {
-        this.toDoList.splice(this.toDoList.indexOf(todo), 1, {
-          id: this.maxToDoUID(this.toDoList),
-          title: values.title,
-          completed: values.completed
-        });
-        this.toDoListSource.next(this.toDoList);
-      }
-    );
+    this.http
+      .patch<ToDo>(`${this.API_URL}/todos/${todo.id}`, { ...todo, values })
+      .subscribe(
+        result => {
+          this.toDoList.splice(this.toDoList.indexOf(todo), 1, {
+            id: this.maxToDoUID(this.toDoList),
+            title: result.title,
+            completed: result.completed
+          });
+          this.toDoListSource.next(this.toDoList);
+        },
+        () => {
+          this.toDoList.splice(this.toDoList.indexOf(todo), 1, {
+            id: this.maxToDoUID(this.toDoList),
+            title: values.title,
+            completed: values.completed
+          });
+          this.toDoListSource.next(this.toDoList);
+        }
+      );
   }
   deleteTodo(data: ToDo): void {
     this.http.delete<ToDo>(`${this.API_URL}/todos/${data.id}`).subscribe(
