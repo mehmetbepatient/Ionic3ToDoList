@@ -10,6 +10,7 @@ import { map } from "rxjs/operators";
   See https://angular.io/guide/dependency-injection for more info on providers
   and Angular DI.
 */
+
 export interface ToDo {
   id: number;
   title: string;
@@ -61,6 +62,8 @@ export class JsonPlaceholderProvider {
   }
 
   patchTodo(todo: ToDo, values: PartialToDo): void {
+    if (!values.title) values.title = todo.title;
+
     this.http.patch<ToDo>(`${this.API_URL}/todos/${todo.id}`, values).subscribe(
       result => {
         this.toDoList.splice(this.toDoList.indexOf(todo), 1, {
@@ -80,7 +83,7 @@ export class JsonPlaceholderProvider {
       }
     );
   }
-  deleteTodo(data): void {
+  deleteTodo(data: ToDo): void {
     this.http.delete<ToDo>(`${this.API_URL}/todos/${data.id}`).subscribe(
       () => {
         this.toDoList.splice(this.toDoList.indexOf(data), 1);

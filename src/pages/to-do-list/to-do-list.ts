@@ -45,7 +45,6 @@ export class ToDoListPage implements OnInit {
   updateStatus(toDo: ToDo) {
     setTimeout(() => {
       this.todosService.patchTodo(toDo, {
-        title: toDo.title,
         completed: !toDo.completed
       });
     }, 500);
