@@ -1,3 +1,5 @@
+import { StoreModule } from "@ngrx/store";
+import { StoreDevtoolsModule } from "@ngrx/store-devtools";
 import { NgModule, ErrorHandler } from "@angular/core";
 import { BrowserModule } from "@angular/platform-browser";
 import { HttpClientModule } from "@angular/common/http";
@@ -10,18 +12,25 @@ import { TabsPage } from "../pages/tabs/tabs";
 
 import { StatusBar } from "@ionic-native/status-bar";
 import { SplashScreen } from "@ionic-native/splash-screen";
-import { JsonPlaceholderProvider } from "../providers/json-placeholder/json-placeholder";
+import { ToDoListService } from "../providers/todolist/todolist.service";
+import { reducer } from "../providers/todolist/todolist.reducer";
 
 @NgModule({
   declarations: [MyApp, AddToDoPage, ToDoListPage, TabsPage],
-  imports: [BrowserModule, HttpClientModule, IonicModule.forRoot(MyApp)],
+  imports: [
+    BrowserModule,
+    HttpClientModule,
+    IonicModule.forRoot(MyApp),
+    StoreModule.forRoot({ myApp: reducer }),
+    StoreDevtoolsModule.instrument({ maxAge: 25 })
+  ],
   bootstrap: [IonicApp],
   entryComponents: [MyApp, AddToDoPage, ToDoListPage, TabsPage],
   providers: [
     StatusBar,
     SplashScreen,
     { provide: ErrorHandler, useClass: IonicErrorHandler },
-    JsonPlaceholderProvider
+    ToDoListService
   ]
 })
 export class AppModule {}

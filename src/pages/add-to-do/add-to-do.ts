@@ -5,14 +5,7 @@ import {
   NavParams,
   ToastController
 } from "ionic-angular";
-import { JsonPlaceholderProvider } from "../../providers/json-placeholder/json-placeholder";
-
-/**
- * Generated class for the AddToDoPage page.
- *
- * See https://ionicframework.com/docs/components/#navigation for more info on
- * Ionic pages and navigation.
- */
+import { ToDoListService } from "../../providers/todolist/todolist.service";
 
 @IonicPage()
 @Component({
@@ -25,7 +18,7 @@ export class AddToDoPage {
   constructor(
     public navCtrl: NavController,
     public navParams: NavParams,
-    private todosService: JsonPlaceholderProvider,
+    private todosService: ToDoListService,
     private toast: ToastController
   ) {}
 

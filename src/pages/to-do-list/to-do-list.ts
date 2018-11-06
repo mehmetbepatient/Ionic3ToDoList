@@ -1,3 +1,4 @@
+import { Store, select } from "@ngrx/store";
 import { Observable } from "rxjs/Observable";
 import { Component, OnInit } from "@angular/core";
 import {
@@ -7,9 +8,14 @@ import {
   AlertController
 } from "ionic-angular";
 import {
-  JsonPlaceholderProvider,
+  ToDoListService,
   ToDo
-} from "../../providers/json-placeholder/json-placeholder";
+} from "../../providers/todolist/todolist.service";
+import {
+  AppState,
+  selectFeatureToDoListCompleted,
+  selectFeatureToDoListNotCompleted
+} from "../../providers/todolist/todolist.reducer";
 
 /**
  * Generated class for the ToDoListPage page.
@@ -30,12 +36,17 @@ export class ToDoListPage implements OnInit {
   constructor(
     public navCtrl: NavController,
     public navParams: NavParams,
-    private todosService: JsonPlaceholderProvider,
-    private alertCtrl: AlertController
+    private todosService: ToDoListService,
+    private alertCtrl: AlertController,
+    private store: Store<AppState>
   ) {}
   ngOnInit(): void {
-    this.toDoListCompleted$ = this.todosService.toDoListCompleted$;
-    this.toDoListNotCompleted$ = this.todosService.toDoListNotCompleted$;
+    this.toDoListCompleted$ = this.store.pipe(
+      select(selectFeatureToDoListCompleted)
+    );
+    this.toDoListNotCompleted$ = this.store.pipe(
+      select(selectFeatureToDoListNotCompleted)
+    );
   }
 
   delete(toDo: ToDo) {
