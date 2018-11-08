@@ -7,22 +7,17 @@ import {
   NavParams,
   AlertController
 } from "ionic-angular";
-import {
-  ToDoListService,
-  ToDo
-} from "../../providers/todolist/todolist.service";
+import { ToDo } from "../../providers/todolist/todolist.service";
 import {
   AppState,
   selectFeatureToDoListCompleted,
   selectFeatureToDoListNotCompleted
 } from "../../providers/todolist/todolist.reducer";
-
-/**
- * Generated class for the ToDoListPage page.
- *
- * See https://ionicframework.com/docs/components/#navigation for more info on
- * Ionic pages and navigation.
- */
+import {
+  SetToDoList,
+  PatchToDo,
+  DeleteToDo
+} from "../../providers/todolist/todolist.actions";
 
 @IonicPage()
 @Component({
@@ -36,10 +31,11 @@ export class ToDoListPage implements OnInit {
   constructor(
     public navCtrl: NavController,
     public navParams: NavParams,
-    private todosService: ToDoListService,
     private alertCtrl: AlertController,
     private store: Store<AppState>
-  ) {}
+  ) {
+    this.store.dispatch(new SetToDoList());
+  }
   ngOnInit(): void {
     this.toDoListCompleted$ = this.store.pipe(
       select(selectFeatureToDoListCompleted)
@@ -50,14 +46,19 @@ export class ToDoListPage implements OnInit {
   }
 
   delete(toDo: ToDo) {
-    this.todosService.deleteTodo(toDo);
+    this.store.dispatch(new DeleteToDo(toDo));
   }
 
   updateStatus(toDo: ToDo) {
     setTimeout(() => {
-      this.todosService.patchTodo(toDo, {
-        completed: !toDo.completed
-      });
+      this.store.dispatch(
+        new PatchToDo({
+          todo: toDo,
+          values: {
+            completed: !toDo.completed
+          }
+        })
+      );
     }, 500);
   }
   edit(toDo: ToDo) {
@@ -81,10 +82,16 @@ export class ToDoListPage implements OnInit {
           text: "Save",
           handler: data => {
             console.log("Save clicked");
-            this.todosService.patchTodo(toDo, {
-              title: data.title,
-              completed: false
-            });
+
+            this.store.dispatch(
+              new PatchToDo({
+                todo: toDo,
+                values: {
+                  title: data.title,
+                  completed: false
+                }
+              })
+            );
           }
         }
       ]

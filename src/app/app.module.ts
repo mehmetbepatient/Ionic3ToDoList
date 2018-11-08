@@ -1,3 +1,4 @@
+import { EffectsModule } from "@ngrx/effects";
 import { StoreModule } from "@ngrx/store";
 import { StoreDevtoolsModule } from "@ngrx/store-devtools";
 import { NgModule, ErrorHandler } from "@angular/core";
@@ -14,6 +15,7 @@ import { StatusBar } from "@ionic-native/status-bar";
 import { SplashScreen } from "@ionic-native/splash-screen";
 import { ToDoListService } from "../providers/todolist/todolist.service";
 import { reducer } from "../providers/todolist/todolist.reducer";
+import { ToDoListEffects } from "../providers/todolist/todolist.effects";
 
 @NgModule({
   declarations: [MyApp, AddToDoPage, ToDoListPage, TabsPage],
@@ -22,6 +24,7 @@ import { reducer } from "../providers/todolist/todolist.reducer";
     HttpClientModule,
     IonicModule.forRoot(MyApp),
     StoreModule.forRoot({ myApp: reducer }),
+    EffectsModule.forRoot([ToDoListEffects]),
     StoreDevtoolsModule.instrument({ maxAge: 25 })
   ],
   bootstrap: [IonicApp],

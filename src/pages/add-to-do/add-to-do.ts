@@ -1,3 +1,4 @@
+import { AddToDo } from "./../../providers/todolist/todolist.actions";
 import { Component } from "@angular/core";
 import {
   IonicPage,
@@ -5,7 +6,8 @@ import {
   NavParams,
   ToastController
 } from "ionic-angular";
-import { ToDoListService } from "../../providers/todolist/todolist.service";
+import { Store } from "@ngrx/store";
+import { AppState } from "../../providers/todolist/todolist.reducer";
 
 @IonicPage()
 @Component({
@@ -18,14 +20,13 @@ export class AddToDoPage {
   constructor(
     public navCtrl: NavController,
     public navParams: NavParams,
-    private todosService: ToDoListService,
-    private toast: ToastController
+    private toast: ToastController,
+    private store: Store<AppState>
   ) {}
 
   addToDo() {
-    this.todosService
-      .addTodo(this.todoToAdd)
-      .then(data => this.presentToast(data));
+    this.store.dispatch(new AddToDo(this.todoToAdd));
+    this.presentToast(this.todoToAdd);
   }
 
   presentToast(data) {
