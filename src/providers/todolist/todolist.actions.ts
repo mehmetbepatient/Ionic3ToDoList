@@ -30,8 +30,6 @@ export class GetToDoListSuccess implements Action {
 
 export class GetToDoListFailed implements Action {
   readonly type = ToDoListActionTypes.GET_TODO_LIST_FAILED;
-
-  constructor(public payload?: any) {}
 }
 
 export class PatchToDo implements Action {
@@ -47,7 +45,7 @@ export class PatchToDoSuccess implements Action {
 export class PatchToDoFailedId implements Action {
   readonly type = ToDoListActionTypes.PATCH_TODO_FAILED_ID;
 
-  constructor(public payload?: any) {}
+  constructor(public payload: PatchRes) {}
 }
 export class DeleteToDo implements Action {
   readonly type = ToDoListActionTypes.DELETE_TODO;
@@ -62,7 +60,7 @@ export class DeleteToDoSuccess implements Action {
 export class DeleteToDoFailedId implements Action {
   readonly type = ToDoListActionTypes.DELETE_TODO_FAILED_ID;
 
-  constructor(public payload?: any) {}
+  constructor(public payload: ToDo) {}
 }
 export class AddToDo implements Action {
   readonly type = ToDoListActionTypes.ADD_TODO;
@@ -78,8 +76,6 @@ export class AddToDoSuccess implements Action {
 
 export class AddToDoFailed implements Action {
   readonly type = ToDoListActionTypes.ADD_TODO_FAILED;
-
-  constructor(public payload?: any) {}
 }
 
 export type ToDoListActions =
